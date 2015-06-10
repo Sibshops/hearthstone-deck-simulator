@@ -1,0 +1,61 @@
+#include <cstdlib>
+#include <iostream>
+#include <ctime>
+#include <sstream>
+#include <algorithm>
+
+#include "include/Deck.hpp"
+
+Deck_Cl::Deck_Cl()
+   : m_cards(),
+     m_cardIndex(0)
+{
+}
+
+void Deck_Cl::populateWithRandom()
+{
+   // Clear the existing cards.
+   m_cards.clear();
+
+   for (int cardIdx = 0;
+        cardIdx < Deck_Ns::cSIZE;
+        ++cardIdx)
+   {
+      m_cards.push_back(Card_Ns::generateRandomCard());      
+   }
+}
+
+
+
+std::string Deck_Cl::getDeckHistogram() const
+{
+   std::vector<int> histogram(Card_Ns::cMAX + 1, 0);
+
+   // Build the histogram
+   for(Card_Cl::Vector_Ty::const_iterator cardIter = m_cards.begin();
+       cardIter != m_cards.end();
+       ++cardIter)
+   {
+      // The cost of the card.
+      const int cMANA_COST = cardIter->getManaCost();
+
+      ++histogram[cMANA_COST];      
+   }
+
+   // The output string stream.
+   std::stringstream oss;
+   
+   // Print the histogram
+   for (int i = 0; i < histogram.size(); ++i)
+   {
+      oss << i << "-" << histogram[i] << " ";
+   }
+
+   return oss.str();
+}
+   
+
+void Deck_Cl::shuffle()
+{
+   std::random_shuffle(m_cards.begin(), m_cards.end());   
+}

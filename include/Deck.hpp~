@@ -1,0 +1,25 @@
+#ifndef DECK_HPP
+#define DECK_HPP
+
+ 
+#include <vector>
+
+#include "include/Card.hpp"
+
+
+// My deck
+class Deck_Cl
+{
+public:
+
+   // The constructor
+   Deck_Cl();
+
+   // Populate the deck with 30 random cards. Mana 1-10.
+   void populateWithRandom();
+   
+   // The cards in the deck.
+   std::vector<Card_Cl> m_cards;
+};
+
+#endif /* DECK_HPP */

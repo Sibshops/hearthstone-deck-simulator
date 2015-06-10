@@ -1,0 +1,23 @@
+#include "include/Card.hpp"
+
+
+namespace Card_Ns
+{
+   int cMIN = 1;
+
+   int cMAX = 10;
+}
+
+/*
+Card_Cl::Card_Cl()
+   : m_manaCost(-1)
+{
+}
+*/
+
+Card_Cl::Card_Cl(
+   const int& manaCost)
+   : m_manaCost(manaCost)
+{
+}
+
