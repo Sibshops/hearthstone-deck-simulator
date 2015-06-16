@@ -32,7 +32,19 @@ public:
    void addCard(
       /// The card to add.
       const Card_Cl& card);
-     
+
+   // Pass the cards that are still in my hand. Shuffle the rest of the deck.
+   void mulliganKeep(
+      // These cards are still in my hand.
+      const Card_Cl::List_Ty& stillInHand);
+
+   // Modify one card in the deck. If a card of that value can't be found, return false.
+   bool modifyOneCard(
+      // The value of the card to modify.
+      const int fromValue,
+      // The new value of that card.
+      const int toValue);
+   
 private:
    
    // The cards in the deck. Assume the deck is already shuffled.

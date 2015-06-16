@@ -14,3 +14,10 @@ Card_Cl::Card_Cl(
 {
 }
 
+
+bool Card_Cl::operator==(
+   const Card_Cl& rh) const
+{
+   return (m_manaCost == rh.m_manaCost);
+}
+   

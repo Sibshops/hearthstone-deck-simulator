@@ -24,6 +24,14 @@ public:
 
    /// Get the mana cost for the card.
    int getManaCost() const;
+
+   /// Define the equality operator.
+   bool operator==(
+      // Pass the right hand element.
+      const Card_Cl& rh) const;
+
+   void setManaCost(
+      const int& manaCost);
    
 private:
 
@@ -40,21 +48,45 @@ inline int Card_Cl::getManaCost() const
    return m_manaCost;
 }
 
+inline void Card_Cl::setManaCost(
+      const int& manaCost)
+{
+   m_manaCost = manaCost;
+}
+
 namespace Card_Ns
 {
    // Generate a random cost card from 1-10.
-   static Card_Cl generateRandomCard();
+   Card_Cl generateRandomCard(
+      const int min,
+      const int max);
 
+   // generate a mana cost between min and max.
+   int generateRandom(
+      const int min,
+      const int max);
+   
    const int cMIN = 1;
 
    const int cMAX = 9;
 }
 
-
-inline Card_Cl Card_Ns::generateRandomCard()
+inline int Card_Ns::generateRandom(
+   const int min,
+   const int max)
 {
    // The manacost for the card.
-   int manaCost = rand() % (Card_Ns::cMAX + 1 - Card_Ns::cMIN) + Card_Ns::cMIN;
+   int randomNum = rand() % (max + 1 - min) + min;
+
+   return randomNum;
+}
+
+inline Card_Cl Card_Ns::generateRandomCard(
+   const int min,
+   const int max)
+{
+   // The manacost for the card.
+   int manaCost = rand() % (max + 1 - min) + min;
 
    return Card_Cl(manaCost);
 }

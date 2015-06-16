@@ -1,5 +1,6 @@
 #include <string>
 #include <sstream>
+#include <set>
 
 #include "include/Hand.hpp"
 
@@ -16,7 +17,8 @@ void Hand_Cl::draw(
 }
 
 void Hand_Cl::playTurn(
-   int& manaAvailable)
+   const int& manaAvailable,
+   double& manaOnBoard)
 {
    /*
    // Try to burn as much mana with as few cards as possible.
@@ -54,12 +56,13 @@ void Hand_Cl::playTurn(
    }
    */
    
-   Hand_Ns::cast(m_cards, manaAvailable);
+   Hand_Ns::cast(m_cards, manaAvailable, manaOnBoard);
 
-   // If there is 2 mana available, use ability.
-   if (manaAvailable >= 2)
+   // If there is 2 mana available more than on the board, cast the hero power.
+   if (manaAvailable - manaOnBoard >= 2)
    {
-      manaAvailable -= 2;
+      // The hero power uses  half a mana.
+      manaOnBoard += 0.5;
    }
 }
 
@@ -67,13 +70,14 @@ void Hand_Cl::playTurn(
 
 void Hand_Ns::cast(
    Card_Cl::List_Ty& cards,
-   int& manaAvailable)
+   const int& manaAvailable,
+   double& manaOnBoard)
 {
    // The hand with the lowest left over mana.
-   Card_Cl::List_Ty handWithLowestMana = cards;
+   Card_Cl::List_Ty handWithMostOnBoard = cards;
 
    // The best leftover mana.
-   int lowestMana = manaAvailable;
+   double mostManaOnBoard = manaOnBoard;
    
    for (Card_Cl::List_Ty::iterator cardsIter = cards.begin();
         cardsIter != cards.end();
@@ -97,32 +101,36 @@ void Hand_Ns::cast(
             cardsAfterCast.insert(cardsAfterCast.end(), tmpCardsIter, cards.end());
          }
             
-         // Get th mana after the cast.
+         // Get the mana after the cast.
          int manaAfterCast = manaAvailable - cMANA_COST;
 
+         // The mana on board after cast
+         double manaOnBoardAfterCast = manaOnBoard + cMANA_COST;
+         
          // Cast without the card.
-         cast(cardsAfterCast, manaAfterCast);
+         cast(cardsAfterCast, manaAfterCast, manaOnBoardAfterCast);
 
-         if (manaAfterCast < lowestMana)
+         if (manaOnBoardAfterCast > mostManaOnBoard)
          {
-            // This hand uses up more mana.
-            lowestMana = manaAfterCast;
-            handWithLowestMana = cardsAfterCast;
+            // There is more on the board after casting this card, set it as the best.
+            mostManaOnBoard = manaOnBoardAfterCast;
+            handWithMostOnBoard = cardsAfterCast;
          }
-         else if ((manaAfterCast == lowestMana) &&
-                  (cardsAfterCast.size() > handWithLowestMana.size()))
+         else if ((manaAfterCast == mostManaOnBoard) &&
+                  (cardsAfterCast.size() > handWithMostOnBoard.size()))
          {
-            // This hand is bigger after casting. It uses up less cards.
-            lowestMana = manaAfterCast;
-            handWithLowestMana = cardsAfterCast;
+            // This hand is bigger after casting. It uses up less
+            // cards, one 5 mana card is better than a 2 and 3.
+            mostManaOnBoard = manaOnBoardAfterCast;
+            handWithMostOnBoard = cardsAfterCast;
          }
-         // If the hand is bigger, use this.
+
       }      
    }
 
    // Set the return value to the best.
-   cards = handWithLowestMana;
-   manaAvailable = lowestMana;   
+   cards = handWithMostOnBoard;
+   manaOnBoard = mostManaOnBoard;
 }
 
 
@@ -145,4 +153,37 @@ std::string Hand_Ns::getString(
    }
 
    return oss.str();   
+}
+
+
+void Hand_Cl::mulliganDiscard(
+   const int& mulliganOver)
+{
+   // cards after mulliganing.
+   Card_Cl::List_Ty cardsAfterMulligan;
+
+   // Mulligane duplicates.
+   std::set<int> inHand;
+   
+   for (Card_Cl::List_Ty::const_iterator oldHandIter = m_cards.begin();
+        oldHandIter != m_cards.end();
+        ++oldHandIter)
+   {
+      const int cMANA_COST = oldHandIter->getManaCost();
+      
+      if (cMANA_COST > mulliganOver)
+      {
+         // We don't want this card. It is over the mulligan.
+      }
+      else if (inHand.end() == inHand.find(cMANA_COST))
+      {
+         // Can't find the card. Add it.
+         
+         inHand.insert(cMANA_COST);
+         cardsAfterMulligan.push_back(*oldHandIter);
+      }
+   }
+
+   // Set my hand.
+   m_cards = cardsAfterMulligan;
 }

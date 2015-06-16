@@ -21,10 +21,33 @@ void Deck_Cl::populateWithRandom()
         cardIdx < Deck_Ns::cSIZE;
         ++cardIdx)
    {
-      m_cards.push_back(Card_Ns::generateRandomCard());      
+      m_cards.push_back(Card_Ns::generateRandomCard(Card_Ns::cMIN, Card_Ns::cMAX));
    }
 }
 
+
+bool Deck_Cl::modifyOneCard(
+   const int fromValue,
+   const int toValue)
+{
+   bool found = false;
+   
+   // Go through the deck looking for the card.
+   for (Card_Cl::Vector_Ty::iterator deckIter = m_cards.begin();
+        deckIter != m_cards.end();
+        ++deckIter)
+   {
+      if (fromValue == deckIter->getManaCost())
+      {
+         deckIter->setManaCost(toValue);
+         found = true;
+         break;
+      }
+   }
+
+   return found;
+}
+   
 
 
 std::string Deck_Cl::getDeckHistogram() const
@@ -59,4 +82,39 @@ void Deck_Cl::shuffle()
 {
    m_cardIndex = 0;
    std::random_shuffle(m_cards.begin(), m_cards.end());   
+}
+
+
+void Deck_Cl::mulliganKeep(const Card_Cl::List_Ty& stillInHand)
+{
+   // If there are two cards in the hand, point the card index to 2.
+   m_cardIndex = stillInHand.size();
+   
+   // The iterator to swap to.
+   Card_Cl::Vector_Ty::iterator startDeckIter = m_cards.begin();
+
+   // Find each card in the deck and put it into the start index.
+   for (Card_Cl::List_Ty::const_iterator handIter = stillInHand.begin();
+        stillInHand.end() != handIter;
+        ++handIter)
+   {
+      // Go through the deck looking for the card.
+      for (Card_Cl::Vector_Ty::iterator deckIter = startDeckIter;
+           deckIter != m_cards.end();
+           ++deckIter)
+      {
+         if (*handIter == *deckIter)
+         {
+            // We found the card, swap it with the first element and increment the start of the deck.
+            iter_swap(deckIter, startDeckIter);
+
+            startDeckIter++;          
+
+            break;
+         }
+      }
+   }
+   
+   // Shuffle the rest of the deck.
+   std::random_shuffle(startDeckIter, m_cards.end());
 }

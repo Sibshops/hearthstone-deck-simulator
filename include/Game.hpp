@@ -22,10 +22,16 @@ public:
       const Deck_Cl& deck);
    
    /// Play a game with the deck.
-   void play();
+   void play(
+      // Mulligan cards greater than this number.
+      const int& mulliganOver);
 
-   /// Get the average unspent mana for the deck.
-   int getUnspentMana() const;
+   /// Get the amount of mana on the board after the game.
+   double getManaOnBoard() const;
+
+   void mulligan(
+      // mulligan cards over this value.
+      const int& mulliganOver);
    
 private:
 
@@ -39,12 +45,12 @@ private:
    Hand_Cl m_hand;
 
    /// The amount of mana lost this game.
-   int m_unspentMana;
+   double m_manaOnBoard;
 };
 
-inline int Game_Cl::getUnspentMana() const
+inline double Game_Cl::getManaOnBoard() const
 {
-   return m_unspentMana;
+   return m_manaOnBoard;
 }
 
 inline void Game_Cl::setDeck(
