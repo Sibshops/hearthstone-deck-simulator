@@ -6,8 +6,9 @@
 #include <cmath>
 
 #include "include/Game.hpp"
+#include "include/UnitTest.hpp"
 
-
+/*
 // todo fix for hero power
 void oneManaDeck()
 {
@@ -29,7 +30,7 @@ void oneManaDeck()
  
    game.play(3);
 
-   const int cUNSPENT_MANA = game.getManaOnBoard();
+   const int cUNSPENT_MANA = game.getBoard();
 
    // The amount of mana after 10 turns.
    const int cTOTAL_MANA = 10 * (10 + 1) / 2;
@@ -62,7 +63,7 @@ void nineManaDeck()
  
    game.play(3);
 
-   const double cMANA_ON_BOARD = game.getManaOnBoard();
+   const double cMANA_ON_BOARD = game.getBoard();
 
    // Use the 2 mana turns 2-9, then the 9 mana card turn 9.
    const double cEXPECTED_ONBOARD =  0.5 * 7 + 9;
@@ -71,13 +72,22 @@ void nineManaDeck()
 
    assert(fabs(cMANA_ON_BOARD - cEXPECTED_ONBOARD) < 0.1);
 }
+*/
 
 void randomOnce()
 {
    // Fill a random deck
    Deck_Cl deck;
-   deck.populateWithRandom();
-      
+
+   deck.addCard(Card_Ns::getHex());
+   deck.addCard(Card_Ns::getHex());
+   deck.addCard(Card_Ns::getHex());
+   deck.addCard(Card_Ns::getHex());
+   
+   deck.fillRestWithRandom();
+
+   std::cout << "Deck: " << deck.getFullDeckString() << std::endl;
+   
    // Start game.
    Game_Cl game;
    game.setDeck(deck);
@@ -87,13 +97,13 @@ void randomOnce()
    const int cMULLIGAN_OVER = Card_Ns::generateRandom(Card_Ns::cMIN, Card_Ns::cMAX);
    
    game.play(cMULLIGAN_OVER);
-   const double cUNSPENT_GAME = game.getManaOnBoard();
+   const Board_Cl cBOARD = game.getBoard();
       
-   manaOnBoard += cUNSPENT_GAME;
-   std::cout << cUNSPENT_GAME << " - mulligan: " << cMULLIGAN_OVER
+   std::cout << cBOARD.getManaOnBoard() << " - mulligan: " << cMULLIGAN_OVER
              << ", deck: "  << deck.getDeckHistogram() << std::endl;
             
 }
+
 
 double runWithDeck(
    const Deck_Cl& deck)
@@ -112,13 +122,11 @@ double runWithDeck(
    for (int i = 0; i < cGAMES_PER_DECK; ++i)
    {         
       game.play(Hand_Ns::cMULLIGAN);
-      const double cUNSPENT_GAME = game.getManaOnBoard();
       
-      manaOnBoard += cUNSPENT_GAME;
-      // std::cout << cUNSPENT_GAME << " - game " << std::endl;
+      const Board_Cl cBOARD_AFTER_GAME = game.getBoard();
 
-      
-      // std::cout << manaOnBoard / (double)(i+1) << " - average so far " << std::endl;
+      // Subtract the overload after the game is over.
+      manaOnBoard += cBOARD_AFTER_GAME.getEndGameManaOnBoard();
    }
 
    averageManaOnBoard = manaOnBoard / cGAMES_PER_DECK;
@@ -134,7 +142,26 @@ double runWithDeck(
 void changeByOne()
 {
    Deck_Cl deckWithHighestMana;
-   deckWithHighestMana.populateWithRandom();
+
+   deckWithHighestMana.addCard(Card_Ns::getForkedLightning());
+   deckWithHighestMana.addCard(Card_Ns::getForkedLightning());
+   deckWithHighestMana.addCard(Card_Ns::getLightningBolt());
+   deckWithHighestMana.addCard(Card_Ns::getLightningBolt());
+   deckWithHighestMana.addCard(Card_Ns::getCrackle());
+   deckWithHighestMana.addCard(Card_Ns::getLavaShock());
+   deckWithHighestMana.addCard(Card_Ns::getLavaShock());
+   deckWithHighestMana.addCard(Card_Ns::getFeralSpirit());
+   deckWithHighestMana.addCard(Card_Ns::getLavaBurst());
+   deckWithHighestMana.addCard(Card_Ns::getLavaBurst());
+   deckWithHighestMana.addCard(Card_Ns::getLightningStorm());
+   deckWithHighestMana.addCard(Card_Ns::getFireguardDestroyer());
+   deckWithHighestMana.addCard(Card_Ns::getFireguardDestroyer());
+   deckWithHighestMana.addCard(Card_Ns::getEarthElemental());
+   deckWithHighestMana.addCard(Card_Ns::getDoomhammer());
+   deckWithHighestMana.addCard(Card_Ns::getHex());
+   deckWithHighestMana.addCard(Card_Ns::getHex());
+   
+   deckWithHighestMana.fillRestWithRandom();
 
    // The current highest mana on the board.
    double highestMana = 0;
@@ -176,8 +203,9 @@ void changeByOne()
                      std::cout << std::fixed;
                      std::cout << std::setprecision(2) << cMAX_MANA_ON_BOARD - highestManaCurrentDeck <<
                         " - Turns: " << Game_Ns::cTURNS << 
-                        " - mulligan: " << Hand_Ns::cMULLIGAN << " - new best deck: " << currentDeck.getDeckHistogram() << std::endl;
-
+                        " - mulligan: " << Hand_Ns::cMULLIGAN <<
+                        " - new best deck: " << currentDeck.getDeckHistogram() << std::endl;
+                        
                      // Break out of loops.
                      a = Card_Ns::cMAX;
                      b = Card_Ns::cMAX;
@@ -199,64 +227,18 @@ void changeByOne()
    
 }
 
-void randomDeck()
-{
-   while (true)
-   {
-      // Fill a random deck
-      Deck_Cl deck;
-      deck.populateWithRandom();
-      
-      // Start game.
-      Game_Cl game;
-      game.setDeck(deck);
-
-      // The number of games to play per deck
-      const double cGAMES_PER_DECK = 100;
-
-      double manaOnBoard = 0;
-
-      // Generate mulligan for this deck.
-      const int cMULLIGAN_OVER = Card_Ns::generateRandom(2, 6);
-   
-      for (int i = 0; i < cGAMES_PER_DECK; ++i)
-      {         
-         game.play(cMULLIGAN_OVER);
-         const double cUNSPENT_GAME = game.getManaOnBoard();
-      
-         manaOnBoard += cUNSPENT_GAME;
-         // std::cout << cUNSPENT_GAME << " - game " << std::endl;
-
-      
-         // std::cout << manaOnBoard / (double)(i+1) << " - average so far " << std::endl;
-      }
-   
-      // The average unspent mana.
-      const double cAVERAGE_MANA_ON_BOARD = manaOnBoard / cGAMES_PER_DECK;
-
-      // if (cAVERAGE_MANA_ON_BOARD > 51.2)
-      //if (cAVERAGE_MANA_ON_BOARD > 26.3) 
-      if (cAVERAGE_MANA_ON_BOARD > 42.4) // turn 9
-      // if (cAVERAGE_MANA_ON_BOARD > 51.7) // turn 10
-      //if (cAVERAGE_MANA_ON_BOARD > 62.1) // turn 11
-      {
-         std::cout << std::setw(5) << cAVERAGE_MANA_ON_BOARD <<
-            " - average - mulligan: " << cMULLIGAN_OVER << " - deck: " << deck.getDeckHistogram() << std::endl;
-      }
-
-   }
-}
 
 int main()
 {
+
+   // UnitTest_Ns::equalityBoardState();
+   
    // Seed the random number generator
    srand(time(NULL));
 
    // randomOnce();
-   //randomDeck();
    changeByOne();
    
-   // nineManaDeck();
 	return 0;
 }
     

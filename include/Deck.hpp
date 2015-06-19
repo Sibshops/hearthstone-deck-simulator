@@ -16,8 +16,8 @@ public:
    // The constructor
    Deck_Cl();
 
-   // Populate the deck with 30 random cards. Mana 1-10.
-   void populateWithRandom();
+   // Fill the rest of the deck with 30 random cards. Mana 1-10.
+   void fillRestWithRandom();
 
    // Get the deck histogram as a string
    std::string getDeckHistogram() const;
@@ -44,6 +44,12 @@ public:
       const int fromValue,
       // The new value of that card.
       const int toValue);
+
+   // Get a string of the full deck.
+   std::string getFullDeckString() const;
+
+   // Get a string of just the needed cards.
+   std::string getNeededString() const;
    
 private:
    

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "include/Card.hpp"
+#include "include/Board.hpp"
 
 // My hand
 class Hand_Cl
@@ -20,10 +21,8 @@ public:
 
    /// Play a turn. Turn = mana. Return the amount of mana lost.
    void playTurn(
-      /// The turn number or mana cost.
-      const int& manaAvailable,
       /// The amount of mana on board after the turn is played.
-      double& manaOnBoard);
+      Board_Cl& board);
 
    /// Mulligan these cards from the hand. Discard if they are over this value.
    void mulliganDiscard(
@@ -51,16 +50,15 @@ inline const Card_Cl::List_Ty& Hand_Cl::getHand() const
 namespace Hand_Ns
 {
    // Set the mulligan for this run.
-   const int cMULLIGAN = 5;
+   const int cMULLIGAN = 4;
    
    /// Cast a card from the hand, return mana unused.
    void cast(
       /// The cards in the hand, return the cards still available.
       Card_Cl::List_Ty& m_cards,
-      /// Pass the mana available, return what is left after casting all the cards possible.
-      const int& manaAvailable,
-      /// The amount of mana on the board after casting a card from the hand.
-      double& manaOnBoard);
+      /// Pass the boardstate before casting. Return the board state
+      /// after casting.
+      Board_Cl& board);      
 
    // Get a string for a list of cards.
    std::string getString(

@@ -3,11 +3,12 @@
 
 #include "include/Game.hpp"
 
-// #define debug
+//#define debug
+
 Game_Cl::Game_Cl()
    : m_deck(),
      m_hand(),
-     m_manaOnBoard()
+     m_board()
 {
 }
 
@@ -25,8 +26,8 @@ void Game_Cl::play(const int& mulliganOver)
    // Clear my hand.
    m_hand = Hand_Cl();
    
-   // We don't have any mana on the board to start.
-   m_manaOnBoard = 0;
+   // Clear the board.
+   m_board = Board_Cl();
 
    // Shuffle deck.
    m_deck.shuffle();  
@@ -54,20 +55,18 @@ void Game_Cl::play(const int& mulliganOver)
 #ifdef debug
       std::cout << "My hand After Drawing: " << m_hand.getString() << std::endl;
 #endif
-
-      double manaOnBoard = 0;
+      // Take the next turn.
+      m_board.nextTurn();
       
-      m_hand.playTurn(turn, manaOnBoard);
+      m_hand.playTurn(m_board);
       
-      m_manaOnBoard += manaOnBoard;
 #ifdef debug
-      std::cout << "OnBoard this turn "  << manaOnBoard
-                << ", Total On Board " <<  m_manaOnBoard 
+      std::cout << "After turn - "  << m_board.getString() 
                 << ", Hand " << m_hand.getString() << std::endl;
 #endif
    }
 #ifdef debug
-   std::cout << m_manaOnBoard << " On Board for deck = " << m_deck.getDeckHistogram() << std::endl;
+   std::cout << m_board.getString() << " On Board for deck = " << m_deck.getDeckHistogram() << std::endl;
 #endif
 }
 

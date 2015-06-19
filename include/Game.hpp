@@ -7,6 +7,7 @@
 
 #include "include/Deck.hpp"
 #include "include/Hand.hpp"
+#include "include/Board.hpp"
 
 // A single game. Subclass to make special games.
 class Game_Cl
@@ -27,7 +28,7 @@ public:
       const int& mulliganOver);
 
    /// Get the amount of mana on the board after the game.
-   double getManaOnBoard() const;
+   const Board_Cl& getBoard() const;
 
    void mulligan(
       // mulligan cards over this value.
@@ -44,13 +45,13 @@ private:
    /// My hand.
    Hand_Cl m_hand;
 
-   /// The amount of mana lost this game.
-   double m_manaOnBoard;
+   /// The board state.
+   Board_Cl m_board;
 };
 
-inline double Game_Cl::getManaOnBoard() const
+inline const Board_Cl& Game_Cl::getBoard() const
 {
-   return m_manaOnBoard;
+   return m_board;
 }
 
 inline void Game_Cl::setDeck(

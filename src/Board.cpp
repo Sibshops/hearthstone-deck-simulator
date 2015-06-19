@@ -99,7 +99,7 @@ bool Board_Cl::castCard(
       // has to remove a more expensive card. This can only happen
       // when the opponent has enough mana.
       // For example, lightning bolt costs 2 mana total. Cast when there are 3 or more mana crystals.
-      if (card.getManaOnBoard() >= m_manaCrystals)
+      if (card.getTotalManaCost() >= m_manaCrystals)
       {
          return false;
       }
@@ -113,7 +113,7 @@ bool Board_Cl::castCard(
    }
 
    m_manaAvailable = m_manaAvailable - card.getManaCost();
-   m_manaOnBoard = m_manaOnBoard + card.getManaOnBoard();
+   m_manaOnBoard = m_manaOnBoard + card.getTotalManaCost();
    m_overload = m_overload + card.getOverload();
 
    return true;

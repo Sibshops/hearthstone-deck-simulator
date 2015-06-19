@@ -12,16 +12,14 @@ Deck_Cl::Deck_Cl()
 {
 }
 
-void Deck_Cl::populateWithRandom()
+void Deck_Cl::fillRestWithRandom()
 {
-   // Clear the existing cards.
-   m_cards.clear();
-
-   for (int cardIdx = 0;
+   for (int cardIdx = m_cards.size();
         cardIdx < Deck_Ns::cSIZE;
         ++cardIdx)
    {
-      m_cards.push_back(Card_Ns::generateRandomCard(Card_Ns::cMIN, Card_Ns::cMAX));
+      //m_cards.push_back(Card_Ns::generateRandomCard(Card_Ns::cMIN, Card_Ns::cMAX));
+      m_cards.push_back(Card_Ns::generateRandomCard(Card_Ns::cMIN+1, Card_Ns::cMAX-1));
    }
 }
 
@@ -37,7 +35,11 @@ bool Deck_Cl::modifyOneCard(
         deckIter != m_cards.end();
         ++deckIter)
    {
-      if (fromValue == deckIter->getManaCost())
+      if (true == deckIter->isNeeded())
+      {
+         // Ignore needed cards.
+      }
+      else if (fromValue == deckIter->getManaCost())
       {
          deckIter->setManaCost(toValue);
          found = true;
@@ -74,6 +76,13 @@ std::string Deck_Cl::getDeckHistogram() const
       oss << i << "-" << histogram[i] << " ";
    }
 
+   const std::string cNEEDED_STRING = getNeededString();
+
+   if (!cNEEDED_STRING.empty())
+   {
+      oss << "- with: " << cNEEDED_STRING;
+   } 
+  
    return oss.str();
 }
    
@@ -118,3 +127,37 @@ void Deck_Cl::mulliganKeep(const Card_Cl::List_Ty& stillInHand)
    // Shuffle the rest of the deck.
    std::random_shuffle(startDeckIter, m_cards.end());
 }
+
+
+std::string Deck_Cl::getFullDeckString() const
+{
+   std::ostringstream oss;
+
+   for (Card_Cl::Vector_Ty::const_iterator cardIter = m_cards.begin();
+        m_cards.end() != cardIter;
+        ++cardIter)
+   {
+      oss << cardIter->getShortString() << " ";
+   }
+
+   return oss.str();   
+}
+
+std::string Deck_Cl::getNeededString() const
+{
+   std::ostringstream oss;
+
+   for (Card_Cl::Vector_Ty::const_iterator cardIter = m_cards.begin();
+        m_cards.end() != cardIter;
+        ++cardIter)
+   {
+      if (cardIter->isNeeded())
+      {
+         oss << cardIter->getShortString() << " ";
+      }
+   }
+
+   return oss.str();   
+
+}
+

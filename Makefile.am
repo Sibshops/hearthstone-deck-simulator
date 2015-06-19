@@ -8,6 +8,10 @@ nodist_hearthstone_deck_simulator_SOURCES = \
 	src/Deck.cpp \
 	include/Game.hpp \
 	src/Game.cpp \
+	include/Board.hpp \
+	src/Board.cpp \
+	include/UnitTest.hpp \
+	src/UnitTest.cpp \
 	src/main.cpp 
 
 
